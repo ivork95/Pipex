@@ -10,77 +10,87 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include "../libft/libft.h"
-#include <sys/wait.h>
+#include <fcntl.h>
+#include <pipex.h>
 
-
-char	**get_arguments(int arg_count, char **arguments)
+void	child_process(char **argv, int *pipe_fd, char **envp)
 {
-	char	**arg_vec;
-	int		i;
+	int		fd;
+	char	*path;
 
-	arg_vec = (char **)malloc(sizeof(char*) * arg_count);
-	i = 1;
-	while (arguments[i])
+	fd = open(argv[1], O_RDONLY);
+	if (fd == -1)
 	{
-		arg_vec[i - 1] =  ft_strdup(arguments[i]);
-		i++;
+		perror("Error occured while opening the infile");
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		exit (1);
 	}
-	arg_vec[i] = NULL;
-	return(arg_vec);
+	close(pipe_fd[0]);
+	dup2(pipe_fd[1], 1);
+	dup2(fd, 0);
+	close(pipe_fd[0]);
+	close(fd);
+	argv = ft_split(argv[2], ' ');
+	path = get_path(envp, argv[0]);
+	if (execve(path, argv, NULL) == -1)
+	{
+		perror("Could not execute execve\n");
+		exit (127);
+	}
 }
 
-int	main(int argc, char **const	argv)
+void	parrent_process(char **argv, int *pipe_fd, char **envp)
+{
+	int		fd;
+	char	*path;
+
+	wait(0);
+	fd = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0777);
+	if (fd == -1)
+	{
+		perror("Error while opening file");
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		exit (1);
+	}
+	close(pipe_fd[1]);
+	dup2(pipe_fd[0], 0);
+	dup2(fd, 1);
+	argv = ft_split(argv[3], ' ');
+	path = get_path(envp, argv[0]);
+	if (execve(path, argv, NULL) == -1)
+	{
+		perror("Could not execute execve\n");
+		exit (127);
+	}
+	close(pipe_fd[0]);
+}
+
+int	main(int argc, char **const	argv, char **envp)
 {
 	int		pipe_fd[2];
-	char	*cmd;
-	char	**arg_vec;
+	int		pid;
 
-
+	if (argc != 5)
+	{
+		perror("Amout of arguments is incorrect\n");
+		return (1);
+	}
 	if (pipe(pipe_fd) == -1)
 	{
-		perror("An error ocurred with opening the pipe\n");
+		perror("An error ocurred while opening the pipe");
 		return (-1);
 	}
-	if (fork() == 0)
+	pid = fork();
+	if (pid == -1)
 	{
-		// child process
-		close(pipe_fd[0]);  //close the read end of the pipe in child process
-
-		dup2(pipe_fd[1], 1);  // send stdout to the pipe
-		dup2(pipe_fd[1], 2);  // send stderr to the pipe
-
-		close(pipe_fd[1]);
-		arg_vec = get_arguments(argc, argv);
-		cmd = "/usr/bin/ls";
-		if (execve(cmd, arg_vec, NULL) == -1)
-		{
-			perror("Could not execute execve\n");
-			return (-1);
-		}
-		printf("Oops, something went wrong\n");
-		//TODO: free arg_vec
+		perror("An error accured whit the fork");
+		return (-1);
 	}
+	if (pid == 0)
+		child_process(argv, pipe_fd, envp);
 	else
-	{
-		// parent process
-
-		char *buffer;
-		char ret;
-
-		wait(NULL);
-		close(pipe_fd[1]);  // close the write end of the pipe in the parent
-		ret  = 1;
-		while (ret)
-		{
-			ret = get_next_line(pipe_fd[0], &buffer);
-			printf("%s\n", buffer);
-			free(buffer);
-		}
-		close(pipe_fd[0]);
-	}
+		parrent_process(argv, pipe_fd, envp);
 	return (0);
 }

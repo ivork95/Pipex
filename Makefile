@@ -1,5 +1,6 @@
 NAME	=	pipex
-SRCS	=	srcs/pipex.c
+SRCS	=	srcs/pipex.c\
+			srcs/get_path.c
 
 OBJS	=	$(SRCS:.c=.o)
 CC		=	gcc
@@ -12,12 +13,12 @@ $(NAME):	$(LIBFT) $(OBJS)
 $(LIBFT):
 	Make -C libft
 %.o: %.c
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -Ilibft -Iincludes -c $< -o $@
 $(LIBFT):
 	make -C libft
 clean:
 	make fclean -C libft
-	rm -f $(OBJS_PS) $(OBJS_C)
+	rm -f $(OBJS)
 fclean: clean
 	rm -f $(LIBFT)
 	rm -f $(NAME)
