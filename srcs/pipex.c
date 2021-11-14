@@ -12,13 +12,14 @@
 
 #include <fcntl.h>
 #include <pipex.h>
+#include <sys/wait.h>
 
 void	child_process(char **argv, int *pipe_fd, char **envp)
 {
 	int		fd;
 	char	*path;
 
-	fd = open(argv[1], O_RDONLY);
+	fd = open(argv[1], O_RDONLY) ;
 	if (fd == -1)
 	{
 		perror("Error occured while opening the infile");
@@ -29,8 +30,7 @@ void	child_process(char **argv, int *pipe_fd, char **envp)
 	close(pipe_fd[0]);
 	dup2(pipe_fd[1], 1);
 	dup2(fd, 0);
-	close(pipe_fd[0]);
-	close(fd);
+
 	argv = ft_split(argv[2], ' ');
 	path = get_path(envp, argv[0]);
 	if (execve(path, argv, NULL) == -1)
@@ -38,6 +38,8 @@ void	child_process(char **argv, int *pipe_fd, char **envp)
 		perror("Could not execute execve\n");
 		exit (127);
 	}
+	close(pipe_fd[0]);
+	close(fd);
 }
 
 void	parrent_process(char **argv, int *pipe_fd, char **envp)
@@ -65,6 +67,7 @@ void	parrent_process(char **argv, int *pipe_fd, char **envp)
 		exit (127);
 	}
 	close(pipe_fd[0]);
+	close(fd);
 }
 
 int	main(int argc, char **const	argv, char **envp)
