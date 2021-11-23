@@ -6,11 +6,12 @@
 /*   By: ivork <ivork@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/10/27 15:26:26 by ivork         #+#    #+#                 */
-/*   Updated: 2021/10/28 18:20:34 by ivork         ########   odam.nl         */
+/*   Updated: 2021/11/22 17:17:19 by ivork         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <pipex.h>
+#include <stdio.h>
 
 void	free_array(char **array)
 {
