@@ -1,5 +1,5 @@
 NAME	=	pipex
-SRCS	=	srcs/pipex_bonus.c\
+SRCS	=	srcs/pipex.c\
 			srcs/get_path.c
 
 OBJS	=	$(SRCS:.c=.o)
