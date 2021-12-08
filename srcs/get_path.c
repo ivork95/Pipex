@@ -6,12 +6,18 @@
 /*   By: ivork <ivork@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/10/27 15:26:26 by ivork         #+#    #+#                 */
-/*   Updated: 2021/11/22 17:17:19 by ivork         ########   odam.nl         */
+/*   Updated: 2021/11/25 12:08:01 by ivork         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <pipex.h>
 #include <stdio.h>
+
+void	err_func(char *str, int code)
+{
+	perror(str);
+	exit(code);
+}
 
 void	free_array(char **array)
 {
