@@ -6,7 +6,7 @@
 /*   By: ivork <ivork@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2021/10/27 15:26:26 by ivork         #+#    #+#                 */
-/*   Updated: 2021/11/25 12:08:01 by ivork         ########   odam.nl         */
+/*   Updated: 2021/12/17 18:12:40 by ivork         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	free_array(char **array)
 		free(array[i]);
 		i++;
 	}
+	free(array[i]);
 	free(array);
 	return ;
 }
@@ -36,27 +37,28 @@ void	free_array(char **array)
 char	*get_path(char **arguments, char *cmd)
 {
 	char	*path;
+	char	*full_path;
 	int		i;
 
-	i = 0;
-	while (arguments[i])
+	while (*arguments)
 	{
-		if (ft_strncmp(arguments[i], "PATH=", 5) == 0)
-			path = ft_strdup(arguments[i]);
-		i++;
+		if (ft_strncmp(*arguments, "PATH=", 5) == 0)
+			path = ft_strdup(*arguments);
+		arguments++;
 	}
 	arguments = ft_split(path, ':');
 	free(path);
 	i = 0;
-	cmd = ft_strjoin("/", cmd);
+	path = ft_strjoin("/", cmd);
 	while (arguments[i])
-	{	
-		arguments[i] = ft_strjoin(arguments[i], cmd);
-		if (access(arguments[i], F_OK) == 0)
-			path = ft_strdup(arguments[i]);
+	{
+		full_path = ft_strjoin(arguments[i], path);
+		if (access(full_path, F_OK) == 0)
+			break ;
+		free(full_path);
 		i++;
 	}
 	free_array(arguments);
-	free(cmd);
-	return (path);
+	free(path);
+	return (full_path);
 }

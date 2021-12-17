@@ -6,7 +6,7 @@
 /*   By: ivork <ivork@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2020/11/08 21:11:29 by ivork         #+#    #+#                 */
-/*   Updated: 2021/10/12 17:50:11 by ivork         ########   odam.nl         */
+/*   Updated: 2021/12/17 13:49:31 by ivork         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ char	**ft_split(char const *s, char c)
 	if (!s)
 		return (0);
 	words = ft_count_words(s, c);
-	arr = (char **)malloc(sizeof(char *) * words + 1);
+	arr = (char **)malloc(sizeof(char *) * (words + 1));
 	if (arr == NULL)
 		return (NULL);
 	arr[words] = NULL;
